@@ -18,18 +18,22 @@
  *   TRUE if SAML user is allowed to log in, FALSE if not.
  */
 function stanford_earth_saml_simplesamlphp_auth_allow_login($attributes) {
+  // default is any valid user allowed unless workgroups or SUNets specified.
   $allowed = true;
   $config = \Drupal::config('stanford_earth_saml.adminsettings');
   $sunet_str = trim($config->get('stanford_earth_saml_sunets'));
   $wg_str = trim($config->get('stanford_earth_saml_wgs'));
+  // if either workgroups or SUNets are not empty, check them.
   if (!empty($sunet_str) || !empty($wg_str)) {
     $allowed = false;
     if (!empty($wg_str)) {
+      // see if the user is in any of our specified workgroups
       $wg_array = preg_split('/\R/', $wg_str);
       if (isset($attributes['eduPersonEntitlement']) && is_array($attributes['eduPersonEntitlement'])) {
         $allowed = boolval(count(array_intersect($attributes['eduPersonEntitlement'], $wg_array)));
       }
     }
+    // if no workgroups matched, then check SUNets.
     if (!$allowed && !empty($sunet_str)) {
       $sunet_array = preg_split('/\R/', $sunet_str);
       if (isset($attributes['uid']) && is_array($attributes['uid'])) {
@@ -37,39 +41,28 @@ function stanford_earth_saml_simplesamlphp_auth_allow_login($attributes) {
       }
     }
   }
+  // let the simplesamlphp_auth module know if the user is allowed to login.
   return $allowed;
 }
 
 /**
- * Hook to alter the roles assigned to a SAML-authenticated user.
+ * Hook to alter a Drupal user account after SAML authentication.
  *
- * Whenever a user's roles are evaluated this hook will be called, allowing
- * custom logic to be used to alter or even completely replace the roles
- * evaluated.
+ * We are using the simplesamlphp_auth role mapping to assign Drupal roles
+ * based on entitlement attributes. However, that function only adds roles, 
+ * not delete roles, when the user logs in. This hook gets called after the 
+ * user logs in, but before the simplesamlphp_auth role mapping occurs, so 
+ * here we remove any roles specified in the role mapping. Those roles will
+ * be added back when the role mapping routine is called.
  *
- * @param array &$roles
- *   The roles that have been selected for the current user
- *   by the role evaluation process.
+ * @param \Drupal\user\UserInterface $account
+ *   The Drupal account that can be altered.
  * @param array $attributes
  *   The SimpleSAMLphp attributes for this user.
+ *
+ * @return \Drupal\user\UserInterface|bool
+ *   The altered Drupal account or FALSE if nothing was changed.
  */
-function stanford_earth_saml_simplesamlphp_auth_user_roles_alter(&$roles, $attributes) {
-  $xyz = 1;
-  /*
-  if (isset($attributes['roles'])) {
-    // The roles provided by the IdP.
-    $sso_roles = $attributes['roles'];
-
-    // Match role names in the saml attributes to local role names.
-    $user_roles = array_intersect(user_roles(), $sso_roles);
-
-    foreach (array_keys($user_roles) as $rid) {
-      $roles[$rid] = $rid;
-    }
-  }
-  */
-}
-
 function stanford_earth_saml_simplesamlphp_auth_user_attributes(\Drupal\user\UserInterface $account, $attributes) {
   $config = \Drupal::config('simplesamlphp_auth.settings');
   $saml_role_population_str = $config->get('role.population');
@@ -92,4 +85,3 @@ function stanford_earth_saml_simplesamlphp_auth_user_attributes(\Drupal\user\Use
     return false;
   }
 }
-

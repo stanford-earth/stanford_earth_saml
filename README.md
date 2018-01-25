@@ -21,11 +21,17 @@ Installation
 
 Install this module like any other module. [See Drupal Documentation](https://drupal.org/documentation/install/modules-themes/modules-8)
 
+There is a patch needed to make the ReturnTo parameter work properly when doing autologin on 403s. The patch is found at: 
+https://www.drupal.org/files/issues/simplesamlphp_auth-fix_return_to_as_get_parameter.patch
+
 Configuration
 ---
 
-Nothing special needed.
+Adds a Stanford Weblogin tab to the simplesamlphp_auth admin page. 
 
+In that tab, list workgroups and/or SUNet IDs to limit who logs in, otherwise any valid user will log in. 
+
+The tab also includes a checkbox for Auto Login on 403s. Checking the box and saving will set the Default 403 page on the site settings page.
 
 Troubleshooting
 ---

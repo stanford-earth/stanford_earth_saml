@@ -75,6 +75,7 @@
       ->set('stanford_earth_saml_sunets', $form_state->getValue('stanford_earth_saml_sunets'))
       ->set('stanford_earth_saml_auto403login', $form_state->getValue('stanford_earth_saml_auto403login'))
       ->save();
+    // if enabling auto403login, set the default 403 page to the redirect.
     \Drupal::configFactory()->getEditable('system.site')->set('page.403', $uri403)->save();
   }
  
