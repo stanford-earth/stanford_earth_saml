@@ -1,0 +1,95 @@
+<?php
+
+/**
+ * Hook to specify if a SAML-authenticated user is allowed to login.
+ *
+ * Allows other modules to decide whether user with the given set of
+ * attributes is allowed to log in via SSO or not.
+ *
+ * Each implementation should take care of displaying errors, there is no
+ * message implementation at hook invocation. Implementations should return
+ * a boolean indicating the success of the access check. Access will be denied
+ * if any implementations return FALSE.
+ *
+ * @param array $attributes
+ *   The SimpleSAMLphp attributes for this user.
+ *
+ * @return bool
+ *   TRUE if SAML user is allowed to log in, FALSE if not.
+ */
+function stanford_earth_saml_simplesamlphp_auth_allow_login($attributes) {
+  $allowed = true;
+  $config = \Drupal::config('stanford_earth_saml.adminsettings');
+  $sunet_str = trim($config->get('stanford_earth_saml_sunets'));
+  $wg_str = trim($config->get('stanford_earth_saml_wgs'));
+  if (!empty($sunet_str) || !empty($wg_str)) {
+    $allowed = false;
+    if (!empty($wg_str)) {
+      $wg_array = preg_split('/\R/', $wg_str);
+      if (isset($attributes['eduPersonEntitlement']) && is_array($attributes['eduPersonEntitlement'])) {
+        $allowed = boolval(count(array_intersect($attributes['eduPersonEntitlement'], $wg_array)));
+      }
+    }
+    if (!$allowed && !empty($sunet_str)) {
+      $sunet_array = preg_split('/\R/', $sunet_str);
+      if (isset($attributes['uid']) && is_array($attributes['uid'])) {
+        $allowed = boolval(count(array_intersect($attributes['uid'], $sunet_array)));
+      }
+    }
+  }
+  return $allowed;
+}
+
+/**
+ * Hook to alter the roles assigned to a SAML-authenticated user.
+ *
+ * Whenever a user's roles are evaluated this hook will be called, allowing
+ * custom logic to be used to alter or even completely replace the roles
+ * evaluated.
+ *
+ * @param array &$roles
+ *   The roles that have been selected for the current user
+ *   by the role evaluation process.
+ * @param array $attributes
+ *   The SimpleSAMLphp attributes for this user.
+ */
+function stanford_earth_saml_simplesamlphp_auth_user_roles_alter(&$roles, $attributes) {
+  $xyz = 1;
+  /*
+  if (isset($attributes['roles'])) {
+    // The roles provided by the IdP.
+    $sso_roles = $attributes['roles'];
+
+    // Match role names in the saml attributes to local role names.
+    $user_roles = array_intersect(user_roles(), $sso_roles);
+
+    foreach (array_keys($user_roles) as $rid) {
+      $roles[$rid] = $rid;
+    }
+  }
+  */
+}
+
+function stanford_earth_saml_simplesamlphp_auth_user_attributes(\Drupal\user\UserInterface $account, $attributes) {
+  $config = \Drupal::config('simplesamlphp_auth.settings');
+  $saml_role_population_str = $config->get('role.population');
+  $saml_roles = array();
+  $rule_array = explode("|",$saml_role_population_str);
+  foreach ($rule_array as $rule) {
+    $role_array = explode(':',$rule);
+    $saml_roles[] = $role_array[0];
+  }
+  $changed = false;
+  foreach ($saml_roles as $role) {
+    if ($account->hasRole($role)) {
+      $account->removeRole($role);
+      $changed = true;
+    }
+  }
+  if ($changed) {
+    return $account;
+  } else {
+    return false;
+  }
+}
+

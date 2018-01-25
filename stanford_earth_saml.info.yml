@@ -1,0 +1,8 @@
+name: 'Stanford Earth SAML'
+description: 'Implements hooks from the simplesamlphp_auth module and offers automatic login to on 403'
+type: module
+core: 8.x
+package: Stanford
+version: 8.x-1.0-dev
+dependencies:
+  - simplesamlphp_auth

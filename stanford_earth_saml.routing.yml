@@ -1,0 +1,24 @@
+# configure the Stanford Earth SAML config form
+stanford_earth_saml.admin_settings_form:
+  # this will be a tab on the simplesamlphp_auth config form
+  path: '/admin/config/people/simplesamlphp_auth/weblogin'
+  # define where the form will be found and who can access it
+  defaults:  
+    _form: '\Drupal\stanford_earth_saml\Form\StanfordEarthSamlForm'  
+    _title: 'Stanford Weblogin'
+  requirements:  
+    _permission: 'access administration pages'
+#
+# configure an automatic redirect to SAML login on a 403
+stanford_earth_saml.content:
+  # the URI for the redirect controller
+  path: '/redirect2saml'
+  # where the controller lives and who can access it
+  defaults:
+    _controller: '\Drupal\stanford_earth_saml\Controller\StanfordEarthSamlController::content'
+    _title: 'Redirect to SAML login'
+  requirements:
+      _permission: 'access content'
+  # do not cache redirects
+  options:
+    no_cache: TRUE

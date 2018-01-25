@@ -1,0 +1,5 @@
+# set the configuration form as a tab under the simplesamlphp_auth config
+stanford_earth_saml.admin_settings_form:
+  title: Stanford Weblogin
+  route_name: stanford_earth_saml.admin_settings_form
+  parent_id: simplesamlphp_auth.admin_settings_tab

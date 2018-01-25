@@ -1,0 +1,10 @@
+{
+  "name": "stanford-earth/stanford_earth_saml",
+  "description": "simplesamlphp_auth add-on for workgroup authentication and 403 redirect",
+  "type": "stanford-module",
+  "homepage": "https://github.com/stanford-earth/stanford_earth_saml",
+  "authors": [],
+  "license": "GPL-2.0+",
+  "minimum-stability": "dev",
+  "require": {}
+}
