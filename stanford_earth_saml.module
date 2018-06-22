@@ -1,6 +1,13 @@
 <?php
 
 /**
+ * @file
+ * Implements Drupal hooks for stanford_earth_saml module.
+ */
+
+use Drupal\user\UserInterface;
+
+/**
  * Hook to specify if a SAML-authenticated user is allowed to login.
  *
  * Allows other modules to decide whether user with the given set of
@@ -17,23 +24,23 @@
  * @return bool
  *   TRUE if SAML user is allowed to log in, FALSE if not.
  */
-function stanford_earth_saml_simplesamlphp_auth_allow_login($attributes) {
-  // default is any valid user allowed unless workgroups or SUNets specified.
-  $allowed = true;
+function stanford_earth_saml_simplesamlphp_auth_allow_login(array $attributes) {
+  // Default is any valid user allowed unless workgroups or SUNets specified.
+  $allowed = TRUE;
   $config = \Drupal::config('stanford_earth_saml.adminsettings');
   $sunet_str = trim($config->get('stanford_earth_saml_sunets'));
   $wg_str = trim($config->get('stanford_earth_saml_wgs'));
-  // if either workgroups or SUNets are not empty, check them.
+  // If either workgroups or SUNets are not empty, check them.
   if (!empty($sunet_str) || !empty($wg_str)) {
-    $allowed = false;
+    $allowed = FALSE;
     if (!empty($wg_str)) {
-      // see if the user is in any of our specified workgroups
+      // See if the user is in any of our specified workgroups.
       $wg_array = preg_split('/\R/', $wg_str);
       if (isset($attributes['eduPersonEntitlement']) && is_array($attributes['eduPersonEntitlement'])) {
         $allowed = boolval(count(array_intersect($attributes['eduPersonEntitlement'], $wg_array)));
       }
     }
-    // if no workgroups matched, then check SUNets.
+    // If no workgroups matched, then check SUNets.
     if (!$allowed && !empty($sunet_str)) {
       $sunet_array = preg_split('/\R/', $sunet_str);
       if (isset($attributes['uid']) && is_array($attributes['uid'])) {
@@ -41,7 +48,7 @@ function stanford_earth_saml_simplesamlphp_auth_allow_login($attributes) {
       }
     }
   }
-  // let the simplesamlphp_auth module know if the user is allowed to login.
+  // Let the simplesamlphp_auth module know if the user is allowed to login.
   return $allowed;
 }
 
@@ -49,9 +56,9 @@ function stanford_earth_saml_simplesamlphp_auth_allow_login($attributes) {
  * Hook to alter a Drupal user account after SAML authentication.
  *
  * We are using the simplesamlphp_auth role mapping to assign Drupal roles
- * based on entitlement attributes. However, that function only adds roles, 
- * not delete roles, when the user logs in. This hook gets called after the 
- * user logs in, but before the simplesamlphp_auth role mapping occurs, so 
+ * based on entitlement attributes. However, that function only adds roles,
+ * not delete roles, when the user logs in. This hook gets called after the
+ * user logs in, but before the simplesamlphp_auth role mapping occurs, so
  * here we remove any roles specified in the role mapping. Those roles will
  * be added back when the role mapping routine is called.
  *
@@ -63,25 +70,26 @@ function stanford_earth_saml_simplesamlphp_auth_allow_login($attributes) {
  * @return \Drupal\user\UserInterface|bool
  *   The altered Drupal account or FALSE if nothing was changed.
  */
-function stanford_earth_saml_simplesamlphp_auth_user_attributes(\Drupal\user\UserInterface $account, $attributes) {
+function stanford_earth_saml_simplesamlphp_auth_user_attributes(UserInterface $account, array $attributes) {
   $config = \Drupal::config('simplesamlphp_auth.settings');
   $saml_role_population_str = $config->get('role.population');
-  $saml_roles = array();
-  $rule_array = explode("|",$saml_role_population_str);
+  $saml_roles = [];
+  $rule_array = explode("|", $saml_role_population_str);
   foreach ($rule_array as $rule) {
-    $role_array = explode(':',$rule);
+    $role_array = explode(':', $rule);
     $saml_roles[] = $role_array[0];
   }
-  $changed = false;
+  $changed = FALSE;
   foreach ($saml_roles as $role) {
     if ($account->hasRole($role)) {
       $account->removeRole($role);
-      $changed = true;
+      $changed = TRUE;
     }
   }
   if ($changed) {
     return $account;
-  } else {
-    return false;
+  }
+  else {
+    return FALSE;
   }
 }

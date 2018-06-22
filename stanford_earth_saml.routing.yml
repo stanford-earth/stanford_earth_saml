@@ -35,4 +35,3 @@ stanford_earth_saml.logout_redirect:
   #do not cache redirects
   options:
     no_cache: TRUE
-
