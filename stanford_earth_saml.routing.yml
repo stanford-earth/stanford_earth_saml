@@ -22,3 +22,17 @@ stanford_earth_saml.content:
   # do not cache redirects
   options:
     no_cache: TRUE
+# configure a URL for SAML Logout that redirects to HTTP_REFERER
+stanford_earth_saml.logout_redirect:
+  # the URI for the redirect controller
+  path: '/redirectfromsamllogout'
+  # where the controller lives and who can access it
+  defaults:
+    _controller: '\Drupal\stanford_earth_saml\Controller\StanfordEarthSamlLogout::content'
+    _title: 'Redirect from SAML logout'
+  requirements:
+    _permission: 'access content'
+  #do not cache redirects
+  options:
+    no_cache: TRUE
+
