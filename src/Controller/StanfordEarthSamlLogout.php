@@ -21,8 +21,9 @@ class StanfordEarthSamlLogout {
     // Get the HttpReferer from the request.
     $redirect = \Drupal::request()->headers->get('referer', '/');
     \Drupal::logger('debug')->notice('Redirecting to referer %referer.', ['%referer' => $redirect]);
-
-      // Redirect the browser to Weblogin.
+    $request_uri = \Drupal::request()->server->get('REQUEST_URI');
+    \Drupal::logger('debug')->notice('Request URI %requesturi.',['%requesturi' => $request_uri]);
+    // Redirect the browser to Weblogin.
     $response = new RedirectResponse($redirect, RedirectResponse::HTTP_FOUND);
     $response->send();
     return $response;
