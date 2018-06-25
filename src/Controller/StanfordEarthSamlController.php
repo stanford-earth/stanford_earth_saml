@@ -5,6 +5,7 @@ namespace Drupal\stanford_earth_saml\Controller;
 use Drupal\Core\Url;
 use Drupal\Core\Config;
 use Drupal\Core\Controller\ControllerBase;
+use Drupal\system\Controller\Http4xxController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
 /**
@@ -22,7 +23,10 @@ class StanfordEarthSamlController extends ControllerBase {
     // See if autologin is enabled.
     $auto403 = boolval(\Drupal::config('stanford_earth_saml.adminsettings')->get('stanford_earth_saml_auto403login'));
     // Only redirect to saml if autologin enabled and the user anonymous.
-    if (\Drupal::currentUser()->isAnonymous() && $auto403) {
+    // Also only redirect if the uri is *not* /user/logout.
+    $path = \Drupal::request()->getPathInfo();
+    if (\Drupal::currentUser()->isAnonymous() && $auto403 &&
+      $path !== '/user/logout') {
       // Set a ReturnTo parameter to the URI of the request that generated 403.
       $redirect = '/saml_login?ReturnTo=' .
         Url::fromUserInput(\Drupal::request()->server->get('REQUEST_URI'), ['absolute' => TRUE])->toString();

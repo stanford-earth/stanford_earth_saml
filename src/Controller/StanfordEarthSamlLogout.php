@@ -19,10 +19,8 @@ class StanfordEarthSamlLogout {
     // Make sure Varnish doesn't cache the redirect.
     \Drupal::service('page_cache_kill_switch')->trigger();
     // Get the HttpReferer from the request.
-    $redirect = \Drupal::request()->headers->get('referer', '/');
-    \Drupal::logger('debug')->notice('Redirecting to referer %referer.', ['%referer' => $redirect]);
-    $request_uri = \Drupal::request()->server->get('REQUEST_URI');
-    \Drupal::logger('debug')->notice('Request URI %requesturi.',['%requesturi' => $request_uri]);
+    $redirect = \Drupal::request()->cookies->get('Drupal_visitor_earth_logout_redirect', '/');
+    user_cookie_delete('earth_logout_redirect');
     // Redirect the browser to Weblogin.
     $response = new RedirectResponse($redirect, RedirectResponse::HTTP_FOUND);
     $response->send();

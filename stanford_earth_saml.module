@@ -93,3 +93,16 @@ function stanford_earth_saml_simplesamlphp_auth_user_attributes(UserInterface $a
     return FALSE;
   }
 }
+
+/**
+ * Implements hook_user_logout().
+ */
+function stanford_earth_saml_user_logout($account) {
+  $uri = \Drupal::request()->getPathInfo();
+  if ($uri === '/' || $uri === '/user/logout') {
+    user_cookie_delete('earth_logout_redirect');
+  }
+  else {
+    user_cookie_save(['earth_logout_redirect' => $uri]);
+  }
+}
