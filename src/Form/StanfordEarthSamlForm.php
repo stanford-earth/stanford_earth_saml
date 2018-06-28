@@ -2,6 +2,8 @@
 
 namespace Drupal\stanford_earth_saml\Form;
 
+use Drupal\Core\Config\ConfigFactoryInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 
@@ -9,6 +11,33 @@ use Drupal\Core\Form\FormStateInterface;
  * Contains Drupal\stanford_earth_saml\Form\StanfordEarthSamlForm.
  */
 class StanfordEarthSamlForm extends ConfigFormBase {
+
+  /**
+   * The configuration factory.
+   *
+   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   */
+  protected $configFactory;
+
+  /**
+   * StanfordEarthSamlForm constructor.
+   *
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
+   *   The ConfigFactory interface.
+   */
+  public function __construct(ConfigFactoryInterface $configFactory) {
+    $this->configFactory = $configFactory;
+    parent::__construct($configFactory);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('config.factory')
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -76,7 +105,7 @@ class StanfordEarthSamlForm extends ConfigFormBase {
       ->set('stanford_earth_saml_auto403login', $form_state->getValue('stanford_earth_saml_auto403login'))
       ->save();
     // If enabling auto403login, set the default 403 page to the redirect.
-    \Drupal::configFactory()->getEditable('system.site')->set('page.403', $uri403)->save();
+    $this->configFactory->getEditable('system.site')->set('page.403', $uri403)->save();
   }
 
 }
