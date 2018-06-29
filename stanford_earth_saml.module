@@ -100,7 +100,8 @@ function stanford_earth_saml_simplesamlphp_auth_user_attributes(UserInterface $a
 function stanford_earth_saml_user_logout($account) {
   $uri = \Drupal::request()->getPathInfo();
   if ($uri === '/' || $uri === '/user/logout') 
-\Drupal::logger('stanford_earth_saml')->notice('uri / no cookie');{
+{
+\Drupal::logger('stanford_earth_saml')->notice('uri / no cookie');
     // We're going to home page or explicitly logging out so no cookie.
     user_cookie_delete('earth_logout_redirect');
   }
