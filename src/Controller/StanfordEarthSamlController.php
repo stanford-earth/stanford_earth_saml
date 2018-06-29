@@ -119,8 +119,7 @@ class StanfordEarthSamlController extends ControllerBase {
     $this->killswitch->trigger();
     // Get the original page request from a request cookie or use homepage.
     $redirect = $this->requeststack->getCurrentRequest()->cookies->get('Drupal_visitor_earth_logout_redirect', '/');
-\Drupal::logger('stanford_earth_saml')->notice('Redirect to: '.$redirect);
-    //user_cookie_delete('earth_logout_redirect');
+    user_cookie_delete('earth_logout_redirect');
     // Redirect the browser to the page.
     $response = new RedirectResponse($redirect, RedirectResponse::HTTP_FOUND);
     $response->send();
