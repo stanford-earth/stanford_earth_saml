@@ -1,0 +1,24 @@
+<?php
+
+/**
+ * @file
+ * Install code for module.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function stanford_earth_saml_install() {
+
+  // Set module weight negative so user_logout runs here first.
+  module_set_weight('stanford_earth_saml', -100);
+
+}
+
+/**
+ * Implements hook_update_N().
+ */
+function stanford_earth_saml_update_8101() {
+  // Set module weight negative so user_logout runs here first.
+  module_set_weight('stanford_earth_saml', -100);
+}
