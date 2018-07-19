@@ -1,5 +1,5 @@
 # [Stanford Earth Saml](https://github.com/stanford-earth/stanford_earth_saml)
-##### Version: 8.x-1.x-dev
+##### Version: 8.x-1.x-alpha2
 
 Maintainers: [ksharp](https://github.com/ksharp-drupal)
 
