@@ -1,5 +1,11 @@
 # Stanford Earth SAML
 
+8.x-1.0-alpha3
+--------------------------------------------------------------------------------
+_Release Date: 2019-09-23_
+
+- Refixes undead bug where SAML redirects to home page on browser re-open.
+
 8.x-1.0-alpha2
 --------------------------------------------------------------------------------
 _Release Date: 2018_07_18_
