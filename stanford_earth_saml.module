@@ -48,6 +48,20 @@ function stanford_earth_saml_simplesamlphp_auth_allow_login(array $attributes) {
       }
     }
   }
+  // Block unallowed users and unblock allowed users.
+  if (!empty($attributes['uid']) && is_array($attributes['uid'])) {
+    $uid = reset($attributes['uid']);
+    $account = user_load_by_name($uid);
+    if (!empty($account)) {
+      $status = $account->get('status')->getValue();
+
+    }
+//    if (empty($account->getPassword())) {
+//      $account->setPassword(user_password());
+//      $account->save();
+//    }
+  }
+
   // Let the simplesamlphp_auth module know if the user is allowed to login.
   return $allowed;
 }
