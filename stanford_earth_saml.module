@@ -48,6 +48,15 @@ function stanford_earth_saml_simplesamlphp_auth_allow_login(array $attributes) {
       }
     }
   }
+  if (!$allowed && isset($_REQUEST['redirectonfail'])) {
+    $redirect = $GLOBALS['base_url'];
+    if (isset($_REQUEST['destination'])) {
+      $redirect .= $_REQUEST['destination'];
+    }
+    header('Location: ' . $redirect);
+    http_response_code(302);
+    exit();
+  }
   // Let the simplesamlphp_auth module know if the user is allowed to login.
   return $allowed;
 }
