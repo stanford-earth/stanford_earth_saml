@@ -48,15 +48,6 @@ function stanford_earth_saml_simplesamlphp_auth_allow_login(array $attributes) {
       }
     }
   }
-  if (!$allowed && isset($_REQUEST['redirectonfail'])) {
-    $redirect = $GLOBALS['base_url'];
-    if (isset($_REQUEST['destination'])) {
-      $redirect .= $_REQUEST['destination'];
-    }
-    header('Location: ' . $redirect);
-    http_response_code(302);
-    exit();
-  }
   // Let the simplesamlphp_auth module know if the user is allowed to login.
   return $allowed;
 }
@@ -138,7 +129,8 @@ function stanford_earth_saml_user_logout($account) {
 }
 
 /**
- * Implements hook_module_implements_alter().
+ * Implements hook_module_implements_alter() to make sure our
+ * hook_user_logout implementation runs last.
  */
 function stanford_earth_saml_module_implements_alter(&$implementations, $hook) {
   if ($hook == 'user_logout') {
